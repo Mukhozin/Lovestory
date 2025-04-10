@@ -91,6 +91,48 @@
   transform-origin: left;
 }
 
+ .big-heart {
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  background: pink;
+  transform: rotate(45deg);
+  opacity: 0.8;
+  animation: slowFloat 20s linear infinite;
+  z-index: 1;
+}
+
+.big-heart::before,
+.big-heart::after {
+  content: "";
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  background: pink;
+  border-radius: 50%;
+}
+
+.big-heart::before {
+  top: -25px;
+  left: 0;
+}
+
+.big-heart::after {
+  top: 0;
+  left: -25px;
+}
+
+@keyframes slowFloat {
+  0% {
+    transform: translateY(0) scale(1) rotate(45deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-200px) scale(1.3) rotate(45deg);
+    opacity: 0;
+  }
+}
+
 
     /* Cover */
     .cover-img {
@@ -393,6 +435,18 @@
     setInterval(updateLoveDuration, 1000);
     updateLoveDuration();
   });
+
+function spawnBigHeart() {
+    const heart = document.createElement("div");
+    heart.className = "big-heart";
+    heart.style.left = Math.random() * 100 + "vw";
+    heart.style.top = "100%";
+    document.body.appendChild(heart);
+    setTimeout(() => heart.remove(), 10000);
+  }
+
+  setInterval(spawnBigHeart, 1500);
+});
 </script>
 
   
