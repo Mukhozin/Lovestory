@@ -100,6 +100,30 @@
       border-radius: 12px;
       box-shadow: 0 6px 20px rgba(0,0,0,0.1);
     }
+    
+     .funny-love-counter {
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.bubble-box {
+  display: inline-block;
+  padding: 1rem 1.5rem;
+  background: #ffe6f0;
+  border-radius: 30px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #d63384;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+  100% { transform: translateY(0px); }
+}
+
 
     /* Timeline & Gallery */
     .timeline-item img {
@@ -234,6 +258,12 @@
 <section id="cover" class="active">
   <img src="assets/images/cover.jpg" class="cover-img" alt="Cover Photo" />
   <h1>Happy 1st Anniversary</h1>
+
+<div class="funny-love-counter">
+  <div id="funny-counter" class="bubble-box"></div>
+  <p>...and yes, I still want more!</p>
+</div>
+
 </section>
 
 <!-- Timeline -->
@@ -318,6 +348,24 @@
       setTimeout(() => loader.remove(), 800);
     }, 1000);
   });
+
+    function updateLoveDuration() {
+    const startDate = new Date("2023-04-10T00:00:00"); // Ganti dengan tanggal jadianmu
+    const now = new Date();
+    const diff = now - startDate;
+
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor(diff / (1000 * 60 * 60)) % 24;
+    const minutes = Math.floor(diff / (1000 * 60)) % 60;
+    const seconds = Math.floor(diff / 1000) % 60;
+
+    document.getElementById("funny-counter").textContent =
+      `${days} days, ${hours} hrs, ${minutes} mins, ${seconds} secs of pure chaos & cuddles`;
+  }
+
+  setInterval(updateLoveDuration, 1000);
+  updateLoveDuration();
+ }
 
   // Navigation
   const sections = document.querySelectorAll("section");
