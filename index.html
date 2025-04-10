@@ -349,24 +349,6 @@
     }, 1000);
   });
 
-    function updateLoveDuration() {
-    const startDate = new Date("2023-04-10T00:00:00"); // Ganti dengan tanggal jadianmu
-    const now = new Date();
-    const diff = now - startDate;
-
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor(diff / (1000 * 60 * 60)) % 24;
-    const minutes = Math.floor(diff / (1000 * 60)) % 60;
-    const seconds = Math.floor(diff / 1000) % 60;
-
-    document.getElementById("funny-counter").textContent =
-      `${days} days, ${hours} hrs, ${minutes} mins, ${seconds} secs of pure chaos & cuddles`;
-  }
-
-  setInterval(updateLoveDuration, 1000);
-  updateLoveDuration();
- }
-
   // Navigation
   const sections = document.querySelectorAll("section");
   let current = 0;
@@ -392,6 +374,24 @@
         e.preventDefault();
         showSection(index);
       });
+
+function updateLoveDuration() {
+    const startDate = new Date("2023-04-10T00:00:00"); // Ganti dengan tanggal jadianmu
+    const now = new Date();
+    const diff = now - startDate;
+
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor(diff / (1000 * 60 * 60)) % 24;
+    const minutes = Math.floor(diff / (1000 * 60)) % 60;
+    const seconds = Math.floor(diff / 1000) % 60;
+
+    document.getElementById("funny-counter").textContent =
+      `${days} days, ${hours} hrs, ${minutes} mins, ${seconds} secs of pure chaos & cuddles`;
+  }
+
+  setInterval(updateLoveDuration, 1000);
+  updateLoveDuration();
+ }
     });
   });
 </script>
