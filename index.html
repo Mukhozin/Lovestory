@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>1st Anniversary</title>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+  <style>
+    /* Reset & Fonts */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #fff9fb;
+      overflow-x: hidden;
+    }
+    h1, h2, h3 {
+      color: #d63384;
+      text-align: center;
+    }
+
+    /* Loading */
+    #loading-screen {
+      position: fixed;
+      inset: 0;
+      background: #ffeaf1;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      transition: opacity 0.8s ease;
+    }
+    #loading-screen .heart {
+      font-size: 3rem;
+      animation: pulse 1s infinite;
+      color: hotpink;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.3); }
+    }
+
+    /* Sections */
+    section { display: none; padding: 2rem; }
+    section.active { display: block; animation: fadeIn 0.6s ease; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Cover */
+    .cover-img {
+      display: block;
+      margin: 0 auto;
+      max-width: 220px;
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    }
+
+    /* Timeline & Gallery */
+    .timeline-item, .gallery-grid img {
+      text-align: center;
+      margin: 2rem auto;
+      max-width: 80%;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 16px;
+      padding: 1rem;
+    }
+
+    /* Love Letter */
+    .love-letter {
+      background: linear-gradient(to bottom, #ffeaf1, #fff9fb);
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .love-letter .hearts-bg {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 0;
+      pointer-events: none;
+      background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"><text y="25" font-size="28" fill="pink">♥</text></svg>');
+      animation: floatHearts 10s linear infinite;
+      background-repeat: repeat;
+      background-size: 32px;
+      opacity: 0.2;
+    }
+    @keyframes floatHearts {
+      0% { background-position: 0 100%; }
+      100% { background-position: 0 -200%; }
+    }
+
+    .love-letter p {
+      max-width: 700px;
+      margin: 1rem auto;
+      font-size: 1.1rem;
+      line-height: 1.6;
+      background-color: rgba(255,255,255,0.6);
+      padding: 1rem;
+      border-radius: 12px;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 1.5rem;
+      background: #fff0f5;
+      font-size: 0.95rem;
+      color: #888;
+    }
+
+    /* Navigation */
+    .nav-buttons {
+      text-align: center;
+      margin: 2rem;
+    }
+    .nav-buttons button {
+      padding: 10px 20px;
+      margin: 0 10px;
+      background: #ff69b4;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Loading -->
+<div id="loading-screen">
+  <div class="heart">♥</div>
+  <p>Loading... don't cry yet.</p>
+</div>
+
+<!-- Sections Start -->
+<section id="cover" class="active">
+  <img src="assets/images/cover.jpg" class="cover-img" alt="Cover Photo" />
+  <h1>Happy 1st Anniversary</h1>
+</section>
+
+<!-- Timeline -->
+<section id="timeline">
+  <h2>Our Story So Far</h2>
+
+  <div class="timeline-item">
+    <h3>Our First Date</h3>
+    <img src="assets/images/image1.jpg" alt="First Date" />
+    <p>Our first date felt like jumping into the unknown… but with you, it was the softest landing. I didn’t know yet how much you’d mean to me — but I already didn’t want the day to end.</p>
+  </div>
+
+  <div class="timeline-item">
+    <h3>Gacoan Night</h3>
+    <img src="assets/images/image2.jpg" alt="Gacoan" />
+    <p>Gacoan will never taste the same again. That day, between the noodles and our silly jokes, something just clicked — like my heart finally said, "yep, this is the one."</p>
+  </div>
+
+  <div class="timeline-item">
+    <h3>Photo Box Chaos</h3>
+    <img src="assets/images/image3.jpg" alt="Photobox" />
+    <p>We didn’t take perfect photos — and that’s what made them perfect. Blurry, goofy, unfiltered… just like us. Just right.</p>
+  </div>
+
+  <div class="timeline-item">
+    <h3>PlayStation Battle</h3>
+    <img src="assets/images/image4.jpg" alt="PlayStation" />
+    <p>Who knew a game play would turn into a heart-stealing event? You held the controller, but you were really holding my whole focus.</p>
+  </div>
+
+  <div class="timeline-item">
+    <h3>Chicken Feast</h3>
+    <img src="assets/images/image5.jpg" alt="Chicken Feast" />
+    <p>One whole chicken. Zero hesitation. Too full to walk   If that’s not love, I don’t know what is — especially when you with me:).</p>
+  </div>
+</section>
+
+<!-- Gallery -->
+<section id="gallery">
+  <h2>Random Little Moments</h2>
+  <div class="gallery-grid">
+    <img src="assets/images/image6.jpg" alt="Gallery 6" />
+    <img src="assets/images/image7.jpg" alt="Gallery 7" />
+    <img src="assets/images/image8.jpg" alt="Gallery 8" />
+    <img src="assets/images/image9.jpg" alt="Gallery 9" />
+    <img src="assets/images/image10.jpg" alt="Gallery 10" />
+  </div>
+</section>
+
+<!-- Love Letter -->
+<section id="love-letter" class="love-letter">
+  <div class="hearts-bg"></div>
+  <div class="text-content">
+    <h2>To the One Who Makes My Life Extra</h2>
+    <p>A year with you feels like a mix of a rom-com, a meme compilation, and a warm hug — all in one. I never thought someone could be this chaotic, this cute, and somehow still be my peace.</p>
+    <p>You’ve made boring days exciting, made me laugh when I wanted to sulk, and somehow convinced me that sharing food is a love language — even gave you my fries… bahkan kukasih kulit ayam kesukaanmu.</p>
+    <p>I don’t say it enough, but I love the way you care, even when you act like you don’t. I love the way you pout, your weird late-night thoughts, your laugh, and yes — even your dramatic storytelling.</p>
+    <p>Thank you for being exactly who you are — loud, soft, funny, clingy, chaotic... and completely, perfectly you. You’ve made this past year the happiest I've ever had.</p>
+    <p class="text-pink-600">Happy 1st Anniversary. I love you more than Manchester United. (forreal)</p>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  No refunds for emotional damage caused by this page. ♥<br/>
+  <small>Made with chaotic love by your favorite person © 2025</small>
+</footer>
+
+<!-- Navigation Buttons -->
+<div class="nav-buttons">
+  <button onclick="navigate(-1)">Back</button>
+  <button onclick="navigate(1)">Next</button>
+</div>
+
+<!-- Script -->
+<script>
+  // Loading screen
+  window.addEventListener("load", () => {
+    const loader = document.getElementById("loading-screen");
+    setTimeout(() => {
+      loader.style.opacity = "0";
+      setTimeout(() => loader.remove(), 800);
+    }, 1000);
+  });
+
+  // Navigation
+  const sections = document.querySelectorAll("section");
+  let current = 0;
+
+  function showSection(index) {
+    sections.forEach((sec, i) => {
+      sec.classList.toggle("active", i === index);
+    });
+  }
+
+  function navigate(step) {
+    current += step;
+    if (current < 0) current = 0;
+    if (current >= sections.length) current = sections.length - 1;
+    showSection(current);
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    showSection(current);
+  });
+</script>
+
+</body>
+</html>
