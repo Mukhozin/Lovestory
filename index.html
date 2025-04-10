@@ -382,7 +382,6 @@
 
 <!-- Script -->
 <script>
-  // Loading screen
   window.addEventListener("load", () => {
     const loader = document.getElementById("loading-screen");
     setTimeout(() => {
@@ -391,24 +390,23 @@
     }, 1000);
   });
 
-  // Navigation
-  const sections = document.querySelectorAll("section");
-  let current = 0;
-
-  function showSection(index) {
-    sections.forEach((sec, i) => {
-      sec.classList.toggle("active", i === index);
-    });
-  }
-
-  function navigate(step) {
-    current += step;
-    if (current < 0) current = 0;
-    if (current >= sections.length) current = sections.length - 1;
-    showSection(current);
-  }
-
   document.addEventListener("DOMContentLoaded", () => {
+    const sections = document.querySelectorAll("section");
+    let current = 0;
+
+    function showSection(index) {
+      sections.forEach((sec, i) => {
+        sec.classList.toggle("active", i === index);
+      });
+    }
+
+    function navigate(step) {
+      current += step;
+      if (current < 0) current = 0;
+      if (current >= sections.length) current = sections.length - 1;
+      showSection(current);
+    }
+
     showSection(current);
 
     document.querySelectorAll(".top-nav a").forEach((link, index) => {
@@ -419,7 +417,7 @@
     });
 
     function updateLoveDuration() {
-      const startDate = new Date("2024-04-30T00:00:00"); // Ganti dengan tanggal jadianmu
+      const startDate = new Date("2024-04-30T00:00:00");
       const now = new Date();
       const diff = now - startDate;
 
@@ -434,18 +432,19 @@
 
     setInterval(updateLoveDuration, 1000);
     updateLoveDuration();
+
+    // Floating heart
+    function spawnBigHeart() {
+      const heart = document.createElement("div");
+      heart.className = "big-heart";
+      heart.style.left = Math.random() * 100 + "vw";
+      heart.style.top = "100%";
+      document.body.appendChild(heart);
+      setTimeout(() => heart.remove(), 10000);
+    }
+
+    setInterval(spawnBigHeart, 1500);
   });
-
-function spawnBigHeart() {
-    const heart = document.createElement("div");
-    heart.className = "big-heart";
-    heart.style.left = Math.random() * 100 + "vw";
-    heart.style.top = "100%";
-    document.body.appendChild(heart);
-    setTimeout(() => heart.remove(), 10000);
-  }
-
-  setInterval(spawnBigHeart, 1500);
 </script>
 
   
