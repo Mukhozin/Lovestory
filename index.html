@@ -68,6 +68,34 @@
       box-shadow: 0 4px 10px rgba(0,0,0,0.1);
    }
 
+    .timeline-item {
+      background: #fffdfc;
+      border: 2px dashed #f8c4d9;
+      padding: 1.5rem;
+      margin: 2rem auto;
+      max-width: 700px;
+      border-radius: 16px;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05);
+      position: relative;
+      transition: transform 0.3s ease;
+   }
+
+    .timeline-item:hover {
+      transform: translateY(-5px);
+   }
+
+    .timeline-item::before {
+      content: "";
+      position: absolute;
+      top: -10px;
+      left: 20px;
+      width: 60px;
+      height: 8px;
+      background-color: #f8c4d9;
+      border-radius: 4px;
+   }
+
+
     .gallery-grid img {
       width: 100%;
       border-radius: 10px;
