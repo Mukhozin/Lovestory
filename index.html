@@ -338,6 +338,13 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     showSection(current);
+
+    document.querySelectorAll(".top-nav a").forEach((link, index) => {
+      link.addEventListener("click", (e) => {
+        e.preventDefault();
+        showSection(index);
+      });
+    });
   });
 </script>
   
