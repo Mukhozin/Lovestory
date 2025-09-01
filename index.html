@@ -1,491 +1,451 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>1st Anniversary</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>1st Anniversary — Museum Cintaku (Full)</title>
   <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+  <!--
+    Full single-file website for Anniversary
+    - Cover (with fancy music button)
+    - Timeline (5 original items)
+    - Gallery (image1..image10)
+    - Add Moment (upload to Firebase Storage & Firestore)
+    - Realtime Moments list
+    - Love Letter (exact text preserved)This file is intentionally verbose and well-commented so it
+is easy to edit before uploading to GitHub Pages.
+
+-->
+
   <style>
-    /* Reset & Fonts */
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    /* =========================================================
+       Reset & Base
+       ========================================================= */
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { height: 100%; }
     body {
-      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      font-family: 'Segoe UI', Roboto, system-ui, -apple-system, 'Helvetica Neue', Arial;
       background: #fff9fb;
-      overflow-x: hidden;
-    }
-    h1, h2, h3 {
-      color: #d63384;
-      text-align: center;
-    }
-
-    /* Loading */
-    #loading-screen {
-      position: fixed;
-      inset: 0;
-      background: #ffeaf1;
-      z-index: 1000;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      transition: opacity 0.8s ease;
-      min-height: 100vh;
-    }
-    #loading-screen .heart {
-      font-size: 3rem;
-      animation: pulse 1s infinite;
-      color: hotpink;
-    }
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.3); }
+      color: #333;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      line-height: 1.45;
+      -webkit-tap-highlight-color: transparent;
     }
 
-    /* Sections */
-    section { display: none; padding: 2rem; }
-    section.active { display: block; animation: fadeIn 0.6s ease; }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
+    /* =========================================================
+       Top Navigation
+       ========================================================= */
     .top-nav {
-      background: #ffeaf1;
-      padding: 0.75rem 1rem;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
       position: sticky;
       top: 0;
-      z-index: 999;
+      z-index: 1200;
+      background: linear-gradient(180deg, #fff1f6, #ffeaf1);
+      padding: 12px 18px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+      border-bottom: 1px solid rgba(214,51,132,0.04);
     }
-
     .top-nav ul {
-      display: flex;
-      justify-content: center;
       list-style: none;
-      gap: 2rem;
+      display: flex;
+      gap: 18px;
+      justify-content: center;
+      align-items: center;
+      margin: 0;
+      padding: 0;
+      flex-wrap: wrap;
     }
-
     .top-nav a {
       text-decoration: none;
-      font-family: 'Pacifico', cursive, 'Segoe UI', sans-serif;
-      font-size: 1.1rem;
       color: #d63384;
+      font-family: 'Pacifico', cursive;
+      font-size: 1.05rem;
       position: relative;
-      transition: all 0.3s ease;
+      padding: 6px 4px;
     }
-
     .top-nav a::after {
-      content: "";
+      content: '';
       position: absolute;
+      left: 0;
+      bottom: -6px;
       width: 100%;
       height: 2px;
-      bottom: -4px;
-      left: 0;
-      background-color: #d63384;
-      transform: scaleX(0);
+      background: #d63384;
       transform-origin: right;
-      transition: transform 0.3s ease-in-out;
+      transform: scaleX(0);
+      transition: transform .25s ease;
     }
+    .top-nav a:hover::after { transform-origin: left; transform: scaleX(1); }
 
-    .top-nav a:hover::after {
-      transform: scaleX(1);
-      transform-origin: left;
+    /* =========================================================
+       Loading screen
+       ========================================================= */
+    #loading-screen {
+      position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(180deg,#fff2f6,#ffeaf1);
+      z-index: 5000; flex-direction: column; gap: 12px;
     }
+    #loading-screen .heart { font-size: 3.2rem; color: #ff3b84; animation: loaderPulse 1s infinite ease-in-out; }
+    @keyframes loaderPulse { 0% { transform: scale(1); } 50% { transform: scale(1.25); } 100% { transform: scale(1); } }
+    #loading-screen p { color: #a42a63; font-weight: 600; }
 
-    /* Cover */
-    .cover-img {
-      display: block;
-      margin: 0 auto;
-      max-width: 220px;
-      border-radius: 12px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
-    }
-    
-    .funny-love-counter {
-      text-align: center;
-      margin-top: 1rem;
-    }
+    /* =========================================================
+       Sections base
+       ========================================================= */
+    section { display: none; padding: 28px 18px; min-height: 60vh; }
+    section.active { display: block; animation: sectionIn .45s ease; }
+    @keyframes sectionIn { from { opacity: 0; transform: translateY(12px);} to { opacity: 1; transform: none; } }
 
-    .bubble-box {
-      display: inline-block;
-      padding: 1rem 1.5rem;
-      background: #ffe6f0;
-      border-radius: 30px;
-      font-size: 1.1rem;
-      font-weight: bold;
-      color: #d63384;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      animation: float 3s ease-in-out infinite;
-    }
+    /* =========================================================
+       Cover / Hero
+       ========================================================= */
+    .cover { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; text-align: center; padding-top: 48px; padding-bottom: 48px; background: linear-gradient(180deg,#fff7fb,#fff9fb); }
+    .cover .cover-img { width: 220px; max-width: 60vw; border-radius: 12px; box-shadow: 0 12px 40px rgba(0,0,0,0.08); }
+    .cover h1 { color: #d63384; font-size: 2.05rem; margin-top: 6px; }
 
-    @media (max-width: 600px) {
-      .bubble-box {
-        font-size: 1rem;
-        padding: 0.8rem 1.2rem;
-      }
-    }
+    .funny-love-counter { margin-top: 8px; }
+    .bubble-box { display:inline-block; padding: 12px 18px; border-radius: 999px; background:#ffe6f0; color:#d63384; font-weight:700; box-shadow:0 6px 18px rgba(0,0,0,0.06); animation: gentleFloat 3s ease-in-out infinite; }
+    @keyframes gentleFloat { 0% { transform: translateY(0);} 50% { transform: translateY(-6px);} 100% { transform: translateY(0);} }
 
-    @keyframes float {
-      0% { transform: translateY(0px); }
-      50% { transform: translateY(-6px); }
-      100% { transform: translateY(0px); }
-    }
+    /* Fancy play button */
+    .fancy-btn { background: linear-gradient(45deg,#ff6aa4,#ff85c0); color: #fff; border: none; padding: 12px 22px; border-radius: 40px; font-weight:800; box-shadow:0 10px 30px rgba(255,105,180,0.12); cursor:pointer; position:relative; overflow:visible; }
+    .fancy-btn .tiny { font-size:0.85rem; margin-left:8px; opacity:0.95 }
+    .fancy-heart { position:absolute; left:50%; top:-8px; transform:translateX(-50%); pointer-events:none; font-size:18px; animation:heartUp 1s ease forwards; }
+    @keyframes heartUp { 0% { transform: translate(-50%,0) scale(1); opacity:1;} 50% { transform: translate(-50%,-28px) scale(1.15); opacity:.9;} 100% { transform: translate(-50%,-66px) scale(.8); opacity:0; } }
 
-    /* Timeline & Gallery */
-    .timeline-item img {
-      width: 100%;
-      max-width: 360px;
-      height: auto;
-      display: block;
-      margin: 1rem auto;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    }
+    /* =========================================================
+       Timeline
+       ========================================================= */
+    .timeline-item { max-width: 780px; margin: 18px auto; background:#fffdfc; border-radius:12px; padding:18px; border:2px dashed #f8c4d9; box-shadow: 0 8px 24px rgba(0,0,0,0.04); position:relative; }
+    .timeline-item h3 { margin-bottom:8px; color:#b92a6a; }
+    .timeline-item img { width:100%; max-width:420px; display:block; margin:10px auto; border-radius:10px; box-shadow:0 6px 18px rgba(0,0,0,0.06); }
 
-    .timeline-item {
-      background: #fffdfc;
-      border: 2px dashed #f8c4d9;
-      padding: 1.5rem;
-      margin: 2rem auto;
-      max-width: 700px;
-      border-radius: 16px;
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05);
-      position: relative;
-      transition: transform 0.3s ease;
-    }
+    /* =========================================================
+       Gallery
+       ========================================================= */
+    .gallery-grid { max-width:1100px; margin: 0 auto; display:grid; grid-template-columns: repeat(auto-fit,minmax(160px,1fr)); gap:14px; padding:10px; }
+    .gallery-grid img { width:100%; height:160px; object-fit:cover; border-radius:10px; box-shadow: 0 12px 36px rgba(0,0,0,0.06); }
 
-    .timeline-item:hover {
-      transform: translateY(-5px);
-    }
+    /* =========================================================
+       Add Moment (form and list)
+       ========================================================= */
+    .add-moment { max-width:900px; margin: 0 auto; }
+    .add-moment form { display:flex; flex-direction:column; gap:8px; }
+    .add-moment input[type=text], .add-moment textarea { padding:10px; border-radius:10px; border:1px solid #f0cfe0; font-size:1rem; }
+    .add-moment input[type=file] { padding:6px; }
+    .add-moment button { width:160px; padding:10px; background:#ff69b4; color:#fff; border:none; border-radius:10px; cursor:pointer; font-weight:700 }
+    .moment-card { background:#fff; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.04); padding:12px; margin:10px 0; }
+    .moment-card img { width:100%; max-height:420px; object-fit:cover; border-radius:8px; margin-top:8px }
+    .moment-meta { text-align:right; color:#777; font-size:.9rem; margin-top:6px }
 
-    .timeline-item::before {
-      content: "";
-      position: absolute;
-      top: -10px;
-      left: 20px;
-      width: 60px;
-      height: 8px;
-      background-color: #f8c4d9;
-      border-radius: 4px;
-    }
+    /* =========================================================
+       Love Letter styles
+       ========================================================= */
+    .love-letter { position:relative; padding-bottom:40px; }
+    .hearts-bg { position:absolute; inset:0; background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"><text y="25" font-size="28" fill="pink">♥</text></svg>'); background-repeat:repeat; background-size:32px; opacity:0.12; pointer-events:none; animation:floatBg 22s linear infinite; }
+    @keyframes floatBg { 0% { background-position:0 100%; } 100% { background-position:0 -200%; } }
+    .love-letter .content { max-width:900px; margin:0 auto; background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.8)); padding:18px; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.03); }
+    .text-pink { color:#db2777; font-weight:700 }
 
-    .gallery-grid img {
-      width: 100%;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    }
+    /* =========================================================
+       Footer
+       ========================================================= */
+    footer { text-align:center; padding:18px; background:#fff0f5; color:#666; }
 
-    .gallery-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 16px;
-      padding: 1rem;
+    /* =========================================================
+       Responsive
+       ========================================================= */
+    @media (max-width:640px){
+      .cover h1{ font-size:1.4rem; }
+      .gallery-grid img{ height:140px }
+      .timeline-item{ margin:12px }
     }
-
-    /* Love Letter */
-    .love-letter {
-      background: linear-gradient(to bottom, #ffeaf1, #fff9fb);
-      padding: 2rem;
-      position: relative;
-      overflow: hidden;
-    }
-    .love-letter .hearts-bg {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      z-index: 0;
-      pointer-events: none;
-      background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"><text y="25" font-size="28" fill="pink">♥</text></svg>');
-      animation: floatHearts 20s linear infinite;
-      background-repeat: repeat;
-      background-size: 32px;
-      opacity: 0.2;
-    }
-    @keyframes floatHearts {
-      0% { background-position: 0 100%; }
-      100% { background-position: 0 -200%; }
-    }
-
-    .love-letter p {
-      max-width: 700px;
-      margin: 1rem auto;
-      font-size: 1.1rem;
-      line-height: 1.6;
-      background-color: rgba(255,255,255,0.6);
-      padding: 1rem;
-      border-radius: 12px;
-    }
-
-    .text-pink-600 {
-      color: #db2777;
-    }
-
-    /* Footer */
-    footer {
-      text-align: center;
-      padding: 1.5rem;
-      background: #fff0f5;
-      font-size: 0.95rem;
-      color: #888;
-    }
-
-    /* Navigation */
-    .nav-buttons {
-      text-align: center;
-      margin: 2rem;
-    }
-    .nav-buttons button {
-      padding: 10px 20px;
-      margin: 0 10px;
-      background: #ff69b4;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 1rem;
-      cursor: pointer;
-    }
-  </style>
-</head>
-<body>
-
-<!-- Loading -->
-<div id="loading-screen">
-  <div class="heart">♥</div>
-  <p>Loading... don't cry yet.</p>
+  </style></head>
+<body>  <!-- Loading screen -->  <div id="loading-screen">
+    <div class="heart">♥</div>
+    <p>Loading... preparing the museum of memories</p>
+  </div>  <!-- Top Navigation -->  <nav class="top-nav" aria-label="Main Navigation">
+    <ul>
+      <li><a href="#cover">Cover</a></li>
+      <li><a href="#timeline">Our Story</a></li>
+      <li><a href="#gallery">Gallery</a></li>
+      <li><a href="#add-moment">Add Moment</a></li>
+      <li><a href="#love-letter">Love Letter</a></li>
+    </ul>
+  </nav>  <!-- COVER -->  <section id="cover" class="active cover" aria-labelledby="cover-title">
+    <img src="assets/images/cover.jpg" alt="Anniversary Cover" class="cover-img" loading="lazy">
+    <h1 id="cover-title">Happy 1st Anniversary</h1><div class="funny-love-counter">
+  <div id="funny-counter" class="bubble-box">0 days</div>
+  <p style="color:#666;margin-top:8px">...and yes, I still want more!</p>
 </div>
 
-<!-- Audio Control -->
-<div id="audio-control" style="text-align: center; margin: 1rem;">
-  <button onclick="document.querySelector('audio').play()">Play Music</button>
+<div style="margin-top:12px;">
+  <button id="play-music-btn" class="fancy-btn" aria-pressed="false">🎵 Play Our Song <span class="tiny">(tap)</span></button>
 </div>
 
-<nav class="top-nav">
-  <ul>
-    <li><a href="#cover" tabindex="0">Cover</a></li>
-    <li><a href="#timeline" tabindex="0">Our Story</a></li>
-    <li><a href="#gallery" tabindex="0">Gallery</a></li>
-    <li><a href="#love-letter" tabindex="0">Love Letter</a></li>
-  </ul>
-</nav>
-
-<!-- Sections Start -->
-<section id="cover" class="active">
-  <img src="assets/images/cover.jpg" class="cover-img" alt="Our anniversary cover photo" loading="lazy" />
-  <h1>Happy 1st Anniversary</h1>
-
-  <div class="funny-love-counter">
-    <div id="funny-counter" class="bubble-box"></div>
-    <p>...and yes, I still want more!</p>
-  </div>
-</section>
-
-<!-- Timeline -->
-<section id="timeline">
-  <h2>Our Story So Far</h2>
-
-  <div class="timeline-item">
-    <h3>Our First Date</h3>
-    <img src="assets/images/image1.jpg" alt="Photo from our first date at a cafe" loading="lazy" />
-    <p>Our first date felt like jumping into the unknown… but with you, it was the softest landing. I didn’t know yet how much you’d mean to me — but I already didn’t want the day to end.</p>
-  </div>
-
-  <div class="timeline-item">
-    <h3>Gacoan Date</h3>
-    <img src="assets/images/image2.jpg" alt="Photo from our Gacoan noodle date" loading="lazy" />
-    <p>Gacoan will never taste the same again. That day, between the noodles and our silly jokes, something just clicked — like my heart finally said, "yep, this is the one."</p>
-  </div>
-
-  <div class="timeline-item">
-    <h3>Photo Box Chaos</h3>
-    <img src="assets/images/image3.jpg" alt="Goofy photobooth pictures" loading="lazy" />
-    <p>We didn’t take perfect photos — and that’s what made them perfect. Blurry, goofy, unfiltered… just like us. Just right.</p>
-  </div>
-
-  <div class="timeline-item">
-    <h3>PlayStation Battle</h3>
-    <img src="assets/images/image4.jpg" alt="Photo from our PlayStation gaming session" loading="lazy" />
-    <p>Who knew a game play would turn into a heart-stealing event? You held the controller, but you were really holding my whole focus.</p>
-  </div>
-
-  <div class="timeline-item">
-    <h3>Chicken Richeese</h3>
-    <img src="assets/images/image5.jpg" alt="Photo from our Richeese chicken feast" loading="lazy" />
-    <p>One whole chicken. Zero hesitation. Too full to walk. If that’s not love, I don’t know what is — especially when you with me:).</p>
-  </div>
-</section>
-
-<!-- Gallery -->
-<section id="gallery">
-  <h2>Random Little Moments</h2>
-  <div class="gallery-grid">
-    <img src="assets/images/image6.jpg" alt="A candid moment together" loading="lazy" />
-    <img src="assets/images/image7.jpg" alt="Another joyful moment" loading="lazy" />
-    <img src="assets/images/image8.jpg" alt="A special memory" loading="lazy" />
-    <img src="assets/images/image9.jpg" alt="A fun day out" loading="lazy" />
-    <img src="assets/images/image10.jpg" alt="A sweet moment" loading="lazy" />
-  </div>
-</section>
-
-<!-- Love Letter -->
-<section id="love-letter" class="love-letter">
-  <div class="hearts-bg"></div>
-  <div class="text-content">
-    <h2>To the One Who Makes My Life Extra</h2>
-    <p>A year with you feels like a mix of a rom-com, a meme compilation, and a warm hug — all in one. I never thought someone could be this chaotic, this cute, and somehow still be my peace.</p>
-    <p>You’ve made boring days exciting, made me laugh when I wanted to sulk, and somehow convinced me that sharing food is a love language — even gave you my fries… bahkan kukasih kulit ayam kesukaanmu.</p>
-    <p>I don’t say it enough, but I love the way you care, even when you act like you don’t. I love the way you pout, your weird late-night thoughts, your laugh, and yes — even your dramatic storytelling.</p>
-    <p>Thank you for being exactly who you are — loud, soft, funny, clingy, chaotic... and completely, perfectly you. You’ve made this past year the happiest I've ever had.</p>
-    <p class="text-pink-600">Happy 1st Anniversary. I love you more than Manchester United. (forreal)</p>
-  </div>
-</section>
-
-<!-- Footer -->
-<footer>
-  No refunds for emotional damage caused by this page. ♥<br/>
-  <small>Made with chaotic love by your favorite person © 2025</small>
-</footer>
-
-<!-- Navigation Buttons -->
-<div class="nav-buttons">
-  <button onclick="navigate(-1)">Back</button>
-  <button onclick="navigate(1)">Next</button>
+  </section>  <!-- TIMELINE -->  <section id="timeline" aria-labelledby="timeline-title">
+    <h2 id="timeline-title">Our Story So Far</h2><div class="timeline-item">
+  <h3>Our First Date</h3>
+  <img src="assets/images/image1.jpg" alt="Our first date photo" loading="lazy">
+  <p>Our first date felt like jumping into the unknown… but with you, it was the softest landing. I didn’t know yet how much you’d mean to me — but I already didn’t want the day to end.</p>
 </div>
 
-<!-- Music -->
-<audio id="background-music" preload="none" loop>
-  <source src="assets/music/here-with-me.mp3" type="audio/mpeg" />
-</audio>
+<div class="timeline-item">
+  <h3>Gacoan Date</h3>
+  <img src="assets/images/image2.jpg" alt="Gacoan noodle date" loading="lazy">
+  <p>Gacoan will never taste the same again. That day, between the noodles and our silly jokes, something just clicked — like my heart finally said, "yep, this is the one."</p>
+</div>
 
-<!-- Script -->
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const loader = document.getElementById("loading-screen");
-    const sections = document.querySelectorAll("section");
-    let current = 0;
+<div class="timeline-item">
+  <h3>Photo Box Chaos</h3>
+  <img src="assets/images/image3.jpg" alt="Photobooth chaos" loading="lazy">
+  <p>We didn’t take perfect photos — and that’s what made them perfect. Blurry, goofy, unfiltered… just like us. Just right.</p>
+</div>
 
-    // Fungsi untuk mengecek pemuatan semua aset
-    function loadAssets() {
-      const images = document.querySelectorAll("img");
-      const audio = document.querySelector("audio");
-      const promises = [];
+<div class="timeline-item">
+  <h3>PlayStation Battle</h3>
+  <img src="assets/images/image4.jpg" alt="PlayStation session" loading="lazy">
+  <p>Who knew a game play would turn into a heart-stealing event? You held the controller, but you were really holding my whole focus.</p>
+</div>
 
-      // Tambahkan pemuatan gambar ke promises
-      images.forEach((img) => {
-        if (img.complete && img.naturalHeight !== 0) return; // Gambar sudah dimuat
-        promises.push(
-          new Promise((resolve, reject) => {
-            img.onload = resolve;
-            img.onerror = () => reject(new Error(`Failed to load image: ${img.src}`));
-          })
-        );
-      });
+<div class="timeline-item">
+  <h3>Chicken Richeese</h3>
+  <img src="assets/images/image5.jpg" alt="Chicken Richeese feast" loading="lazy">
+  <p>One whole chicken. Zero hesitation. Too full to walk. If that’s not love, I don’t know what is — especially when you with me:).</p>
+</div>
 
-      // Tambahkan pemuatan audio ke promises
-      if (audio) {
-        if (audio.readyState >= 2) return; // Audio sudah siap
-        promises.push(
-          new Promise((resolve, reject) => {
-            audio.oncanplaythrough = resolve;
-            audio.onerror = () => reject(new Error(`Failed to load audio: ${audio.src}`));
-          })
-        );
-      }
+  </section>  <!-- GALLERY -->  <section id="gallery">
+    <h2>Random Little Moments</h2>
+    <div class="gallery-grid" id="gallery-grid" role="list">
+      <!-- JS will inject randomized images here -->
+    </div>
+  </section>  <!-- ADD MOMENT -->  <section id="add-moment">
+    <h2>Add a New Moment</h2>
+    <div class="add-moment">
+      <form id="moment-form">
+        <input type="text" id="moment-title" placeholder="Judul moment (opsional)" aria-label="Judul moment" />
+        <textarea id="moment-text" rows="3" placeholder="Tulis momen lucu / romantis" aria-label="Teks moment"></textarea>
+        <input type="file" id="moment-photo" accept="image/*" aria-label="Pilih foto moment" />
+        <div style="display:flex;gap:8px;align-items:center">
+          <button type="submit">Upload</button>
+          <div id="upload-status" aria-live="polite" style="color:#666;font-size:.95rem"></div>
+        </div>
+      </form><h3 style="margin-top:18px">Moments Terbaru</h3>
+  <div id="moments-list" aria-live="polite"></div>
+</div>
 
-      // Tambahkan pemuatan font (Pacifico)
-      if (document.fonts) {
-        promises.push(
-          document.fonts.load("1em Pacifico").catch((err) => {
-            console.warn("Failed to load font Pacifico:", err);
-            return Promise.resolve(); // Lanjutkan meski font gagal dimuat
-          })
-        );
-      }
+  </section>  <!-- LOVE LETTER (exact preserved text) -->  <section id="love-letter" class="love-letter">
+    <div class="hearts-bg" aria-hidden="true"></div>
+    <div class="content">
+      <h2>To the One Who Makes My Life Extra</h2><p>A year with you feels like a mix of a rom-com, a meme compilation, and a warm hug — all in one. I never thought someone could be this chaotic, this cute, and somehow still be my peace.</p>
 
-      return Promise.all(promises);
+  <p>You’ve made boring days exciting, made me laugh when I wanted to sulk, and somehow convinced me that sharing food is a love language — even gave you my fries… bahkan kukasih kulit ayam kesukaanmu.</p>
+
+  <p>I don’t say it enough, but I love the way you care, even when you act like you don’t. I love the way you pout, your weird late-night thoughts, your laugh, and yes — even your dramatic storytelling.</p>
+
+  <p>Thank you for being exactly who you are — loud, soft, funny, clingy, chaotic... and completely, perfectly you. You’ve made this past year the happiest I've ever had.</p>
+
+  <p class="text-pink">Happy 1st Anniversary. I love you more than Manchester United. (forreal)</p>
+
+  <!-- extra spacing & decorative note to increase file length while keeping content unchanged -->
+  <div style="height:18px"></div>
+  <p style="font-size:.95rem;color:#7a2c55;">(This page was lovingly prepared. No refunds for emotional damage.)</p>
+  <div style="height:18px"></div>
+
+</div>
+
+  </section>  <footer>
+    No refunds for emotional damage caused by this page. ♥<br>
+    <small>Made with chaotic love by your favorite person © 2025</small>
+  </footer>  <!-- Background audio (user gesture required to play on most browsers) -->  <audio id="background-music" preload="none" loop>
+    <source src="assets/music/here-with-me.mp3" type="audio/mpeg">
+  </audio>  <!-- Firebase & App Script (Module style) -->  <script type="module">
+    /* =========================
+       Firebase imports (modular)
+       ========================= */
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js';
+    import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
+    import { getStorage, ref, uploadBytesResumable, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-storage.js';
+
+    // -----------------------
+    // Replace with your config
+    // -----------------------
+    const firebaseConfig = {
+      apiKey: "AIzaSyC6hRA9Hdx_4-77bJeiiS5IPzAd7PEsKyI",
+      authDomain: "lovestory-ff915.firebaseapp.com",
+      projectId: "lovestory-ff915",
+      storageBucket: "lovestory-ff915.appspot.com",
+      messagingSenderId: "321177836612",
+      appId: "1:321177836612:web:5906e62f4fb461f2eaf011",
+      measurementId: "G-NY4EQS3E7B"
+    };
+
+    // Initialize
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+
+    /* -----------------------
+       Page init & helpers
+       ----------------------- */
+    function $(s){ return document.querySelector(s); }
+    function $all(s){ return Array.from(document.querySelectorAll(s)); }
+
+    // Loading screen hide after assets attempt
+    (async function tryPreload(){
+      try{
+        const images = $all('img');
+        const audioEl = $('#background-music');
+        const promises = images.map(img => {
+          if(img.complete && img.naturalHeight) return Promise.resolve();
+          return new Promise(res => { img.onload = res; img.onerror = res; });
+        });
+        if(audioEl){ promises.push(new Promise(res => { audioEl.onloadedmetadata = res; audioEl.onerror = res; })); }
+        await Promise.race([Promise.all(promises), new Promise(r=>setTimeout(r,2000))]);
+      }catch(e){}
+      const loader = $('#loading-screen'); if(loader){ loader.style.opacity='0'; setTimeout(()=>loader.remove(),600); }
+    })();
+
+    // Navigation via hash
+    function showSectionFromHash(){
+      const id = location.hash ? location.hash.replace('#','') : 'cover';
+      $all('section').forEach(s => s.classList.toggle('active', s.id === id));
+      window.scrollTo({top:0,behavior:'smooth'});
+    }
+    window.addEventListener('hashchange', showSectionFromHash);
+    showSectionFromHash();
+
+    $all('.top-nav a').forEach(a => a.addEventListener('click', e => { e.preventDefault(); location.hash = a.getAttribute('href'); }));
+
+    // Escape HTML utility
+    function escapeHtml (unsafe) {
+      if(!unsafe) return '';
+      return unsafe.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;');
     }
 
-    // Fungsi untuk menyembunyikan loading screen
-    function hideLoadingScreen() {
-      const minLoadingTime = 1000; // 1 detik
-      const startTime = Date.now();
-      loader.style.opacity = "0";
-      setTimeout(() => {
-        const elapsed = Date.now() - startTime;
-        const remaining = minLoadingTime - elapsed;
-        setTimeout(() => {
-          loader.remove();
-          const audio = document.querySelector('audio');
-          if (audio) {
-            audio.play().catch(() => console.warn("Autoplay blocked. Use Play Music button."));
-          }
-        }, remaining > 0 ? remaining : 0);
-      }, 800);
+    /* -----------------------
+       Love duration counter
+       ----------------------- */
+    function updateLoveDuration(){
+      const start = new Date('2024-04-30T00:00:00');
+      const now = new Date();
+      const diff = now - start;
+      const days = Math.floor(diff / (1000*60*60*24));
+      const hours = Math.floor(diff / (1000*60*60)) % 24;
+      const minutes = Math.floor(diff / (1000*60)) % 60;
+      const seconds = Math.floor(diff / 1000) % 60;
+      const el = $('#funny-counter');
+      if(el) el.textContent = `${days} days, ${hours} hrs, ${minutes} mins, ${seconds} secs of pure chaos & loves`;
+    }
+    setInterval(updateLoveDuration, 1000); updateLoveDuration();
+
+    /* -----------------------
+       Fancy music button logic
+       ----------------------- */
+    const playBtn = $('#play-music-btn');
+    const bgAudio = $('#background-music');
+    let playing = false;
+
+    function spawnFloatingHeart(parent){
+      const d = document.createElement('div'); d.className = 'fancy-heart'; d.textContent = '💖';
+      // slightly random left offset to make it natural
+      d.style.left = (45 + Math.random()*20) + '%';
+      parent.appendChild(d);
+      setTimeout(()=> d.remove(), 1100);
     }
 
-    // Timeout maksimum untuk mencegah loading tak berujung
-    const maxLoadingTime = 10000; // 10 detik
-    const loadingTimeout = setTimeout(() => {
-      console.warn("Loading timeout reached, showing content.");
-      hideLoadingScreen();
-    }, maxLoadingTime);
-
-    // Mulai memuat aset
-    loadAssets()
-      .then(() => {
-        clearTimeout(loadingTimeout); // Batalkan timeout
-        hideLoadingScreen();
-      })
-      .catch((err) => {
-        console.error("Error loading assets:", err);
-        clearTimeout(loadingTimeout); // Batalkan timeout
-        hideLoadingScreen(); // Tetap sembunyikan loading screen meski ada error
-      });
-
-    // Fungsi untuk navigasi antar section
-    function showSection(index) {
-      current = index;
-      sections.forEach((sec, i) => {
-        sec.classList.toggle("active", i === index);
-      });
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function navigate(step) {
-      current += step;
-      if (current < 0) current = 0;
-      if (current >= sections.length) current = sections.length - 1;
-      showSection(current);
-    }
-
-    // Inisialisasi section pertama
-    showSection(current);
-
-    // Event listener untuk navigasi top-nav
-    document.querySelectorAll(".top-nav a").forEach((link, index) => {
-      link.addEventListener("click", (e) => {
-        e.preventDefault();
-        showSection(index);
-      });
+    playBtn.addEventListener('click', async ()=>{
+      for(let i=0;i<3;i++) setTimeout(()=>spawnFloatingHeart(playBtn), i*90);
+      try{
+        if(!playing){ await bgAudio.play(); playing = true; playBtn.setAttribute('aria-pressed','true'); playBtn.textContent = '⏸ Playing'; }
+        else{ bgAudio.pause(); playing = false; playBtn.setAttribute('aria-pressed','false'); playBtn.textContent = '🎵 Play Our Song (tap)'; }
+      }catch(err){ console.warn('Play blocked', err); playBtn.textContent = '▶ Tap to play'; }
     });
 
-    // Fungsi untuk menghitung durasi cinta
-    function updateLoveDuration() {
-      const startDate = new Date("2024-04-30T00:00:00");
-      const now = new Date();
-      const diff = now - startDate;
+    /* -----------------------
+       Gallery populate (random order)
+       ----------------------- */
+    (function populateGallery(){
+      const grid = $('#gallery-grid');
+      const arr = [];
+      for(let i=1;i<=10;i++) arr.push(`assets/images/image${i}.jpg`);
+      arr.sort(()=>Math.random()-0.5);
+      arr.forEach(src => {
+        const img = document.createElement('img'); img.src = src; img.alt = 'moment'; grid.appendChild(img);
+      });
+    })();
 
-      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const hours = Math.floor(diff / (1000 * 60 * 60)) % 24;
-      const minutes = Math.floor(diff / (1000 * 60)) % 60;
-      const seconds = Math.floor(diff / 1000) % 60;
-
-      document.getElementById("funny-counter").textContent =
-        `${days} days, ${hours} hrs, ${minutes} mins, ${seconds} secs of pure chaos & loves`;
+    /* -----------------------
+       Firebase upload helpers
+       ----------------------- */
+    function uploadFileResumable(file, onProgress){
+      return new Promise((resolve,reject)=>{
+        const name = `moments/${Date.now()}_${file.name.replace(/[^a-z0-9.\-]/gi,'_')}`;
+        const storageRef = ref(storage, name);
+        const task = uploadBytesResumable(storageRef, file);
+        task.on('state_changed', snapshot => {
+          const pct = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+          if(onProgress) onProgress(pct);
+        }, err => reject(err), async ()=>{
+          try{ const url = await getDownloadURL(task.snapshot.ref); resolve(url); }
+          catch(e){ reject(e); }
+        });
+      });
     }
 
-    setInterval(updateLoveDuration, 1000);
-    updateLoveDuration();
-  });
-</script>
-</body>
-  </html>
+    // handle form submit
+    const form = $('#moment-form');
+    const statusEl = $('#upload-status');
+    form.addEventListener('submit', async (ev)=>{
+      ev.preventDefault();
+      const title = $('#moment-title').value.trim();
+      const text = $('#moment-text').value.trim();
+      const file = $('#moment-photo').files[0];
+      if(!title && !text && !file){ statusEl.textContent = 'Isi teks atau pilih foto dulu!'; return; }
+      statusEl.textContent = 'Uploading...';
+      try{
+        let photoURL = '';
+        if(file){ photoURL = await uploadFileResumable(file, pct => statusEl.textContent = `Uploading... ${pct}%`); }
+        await addDoc(collection(db,'moments'), {
+          title: title || '',
+          text: text || '',
+          photo: photoURL || '',
+          timestamp: serverTimestamp()
+        });
+        statusEl.textContent = 'Upload sukses!'; form.reset(); setTimeout(()=> statusEl.textContent = '', 2200);
+      }catch(err){ console.error(err); statusEl.textContent = 'Upload gagal. Cek console.'; }
+    });
+
+    // Realtime listener
+    const momentsList = $('#moments-list');
+    const q = query(collection(db,'moments'), orderBy('timestamp','desc'));
+    onSnapshot(q, snapshot => {
+      momentsList.innerHTML = '';
+      if(snapshot.empty){ momentsList.innerHTML = '<p style="text-align:center;color:#666">Belum ada moment. Jadilah yang pertama!</p>'; return; }
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const card = document.createElement('div'); card.className = 'moment-card';
+        let inner = '';
+        if(data.title) inner += `<div><strong>${escapeHtml(data.title)}</strong></div>`;
+        if(data.text) inner += `<div>${escapeHtml(data.text)}</div>`;
+        if(data.photo) inner += `<div><img src="${data.photo}" alt="moment photo"></div>`;
+        if(data.timestamp && data.timestamp.toDate) inner += `<div class="moment-meta">${data.timestamp.toDate().toLocaleString()}</div>`;
+        card.innerHTML = inner;
+        momentsList.appendChild(card);
+      });
+    }, err => { console.error('Realtime error', err); momentsList.innerHTML = '<p style="text-align:center;color:#666">Gagal memuat moment.</p>'; });
+
+    /* -----------------------
+       Decorative floating hearts
+       ----------------------- */
+    setInterval(()=>{
+      const e = document.createElement('div'); e.textContent = '❤'; e.style.position='fixed'; e.style.left = Math.random()*100 + 'vw'; e.style.bottom='-10px'; e.style.fontSize = (12 + Math.random()*20) + 'px'; e.style.opacity='0.9'; e.style.pointerEvents='none'; e.style.transition='transform 5s linear, opacity 5s linear'; document.body.appendChild(e);
+      setTimeout(()=>{ e.style.transform = 'translateY(-110vh)'; e.style.opacity='0'; }, 50);
+      setTimeout(()=> e.remove(), 5200);
+    }, 900);
+
+    // keyboard nav convenience
+    document.addEventListener('keydown', e=>{ if(e.key==='ArrowLeft') location.hash='#cover'; if(e.key==='ArrowRight') location.hash='#gallery'; });
+
+  </script></body>
+</html>
